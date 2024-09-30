@@ -1,4 +1,3 @@
-set -ex
 sleep_time=5
 
 is_number() {
