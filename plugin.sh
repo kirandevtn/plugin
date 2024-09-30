@@ -6,9 +6,8 @@ is_number() {
 if [ $Timeout -gt 100 ]; then
     sleep_time=15
 fi
-echo "------------------------------------------"
-echo "Starting plugin Devtron CI Trigger v1.0.0"
-echo "------------------------------------------"
+echo "Starting the script"
+echo "---------------------"
 app_list=$(curl -s -H "token:$DevtronApiToken" "$DevtronEndpoint/orchestrator/app/autocomplete")
 code=00
 code=$(echo "$app_list" | jq -r ".code")
@@ -54,18 +53,14 @@ json_response=$(curl -s "$DevtronEndpoint/orchestrator/app/ci-pipeline/$ci_pipel
          -H "token: $DevtronApiToken")
 id_array=()
 id_array=($(echo "$json_response" | jq -r '.result[].id'))
-echo "test1"
 
 if [ "$GitCommitHash" ];then
-    echo "test2"
-    echo "test3"
     commits=()
     IFS=','
     for value in $GitCommitHash; do
         commits+=("$value")
     done
     IFS=' '
-    echo "test3"
     mat_payload=()
     comm_len=${#commits[@]}
     id_len=${#id_array[@]}
@@ -120,7 +115,7 @@ if [ "$GitCommitHash" ];then
         exit 1
     fi
     build_art=$(echo "$curl_req" | jq -r ".result.apiResponse")
-    echo "The build with CI pipeline ID $ci_pipeline_id of application $DevtronApp is triggered using the latest commits"
+    echo "The build with CI pipeline ID $ci_pipeline_id of application $DevtronApp is triggered using the given commits"
     echo "Gitcommithash exists"
 else
     echo "No git commits provided. Taking the latest for all."
@@ -135,14 +130,14 @@ else
         materials_payload=$(echo "$ci_pipeline_materials" | jq -s .)
 
         # Constructing the final payload
-        payload=$(jq -n --argjson materials "$materials_payload" --arg pipelineId "$ci_pipeline_id" \
-        '{"pipelineId":$pipelineId|tonumber, "ciPipelineMaterials": $materials, "invalidateCache":false, "pipelineType":"CI_BUILD"}')
+        payload=$(jq -n --argjson IgnoreCache $IgnoreCache --argjson materials "$materials_payload" --arg pipelineId "$ci_pipeline_id" \
+        '{"pipelineId":$pipelineId|tonumber, "ciPipelineMaterials": $materials, "invalidateCache": $IgnoreCache, "pipelineType":"CI_BUILD"}')
 
         echo "$payload"
     }
 
     payload=$(create_payload "$json_response")
-    echo "$payload" | jq "."
+    echo "$payload"
 
     curl_req=$(curl -s "$DevtronEndpoint/orchestrator/app/ci-pipeline/trigger" \
         -H "token: $DevtronApiToken" \
