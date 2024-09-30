@@ -1,9 +1,9 @@
-# Use Alpine-based bash image
-FROM alpine:3.18
+# Use an official lightweight image with bash installed
+FROM bash:5.1.16
 
-# Install bash, curl, and jq
+# Install required dependencies (e.g., curl, jq)
 RUN apk update && \
-    apk add --no-cache bash curl jq
+    apk add --no-cache curl jq
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
