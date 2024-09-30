@@ -1,4 +1,3 @@
-#!/bin/bash
 set -ex
 sleep_time=5
 
