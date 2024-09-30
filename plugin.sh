@@ -173,21 +173,21 @@ else
         if [ "$ci_status" == "Failed" ]; then
             echo "The build has been Failed"
             echo "Exiting the current process"
-            exit 1
+            exit 2
         elif [ "$ci_status" == "CANCELLED" ];then
             echo "Build has been Cancelled"
             echo "Exiting the current process"
-            exit 1
+            exit 2
         elif [ "$ci_status" == "Error" ];then
             echo "Build has encountered an Error"
             echo "Exiting the current process"
-            exit 1
+            exit 2
         fi
         current_time=$(date +%s)
         elapsed_time=$((current_time - start_time))
         if [ "$elapsed_time" -ge "$Timeout" ]; then
             echo "Timeout reached. Terminating the current process...."
-            exit 1
+            exit 2
         fi
         num=$(fetch_status)
         ci_status=$(echo "$num" | jq -r ".result.status")
@@ -205,6 +205,6 @@ else
     if [ "$job_completed" = true ]; then
         echo "The triggered Build is Scuccessfully completed"
     else
-        exit 1
+        exit 2
     fi
 fi
